@@ -1,0 +1,61 @@
+Задача вывода путника из лабиринта. Дан лабиринт размером NхN (N<=15). Форма лабиринта записана в текстовом файле, cтена обозначается символом М, 
+отсутствие стены - символом пробела. Даны координаты мышки в лабиринте (номер строки (X) и номер столбца (Y)) и координаты сыра (номер строки (XС) и номер столбца (YС)). 
+Нужно вывести путь мышки к сыру. Для этого распечатать сам лабиринт и обозначить путь символами +. Гарантируется, что такой путь только один.
+
+#include <windows.h>
+#include <fstream>
+#include <string>
+#pragma hdrstop
+#include "pt4.h"
+using namespace std;
+
+
+void labyrinth(char**& lab, int n, fstream& f) {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++)
+			f << lab[i][j];
+		f << endl;
+	}
+}
+
+void qp(char**& lab, int n, int x, int y, int xc, int yc, fstream& f) {
+	if (lab[x][y] == ' ') {
+		lab[x][y] = '+';
+		if (x == xc && y == yc)
+			labyrinth(lab, n, f);
+		else {
+			if (x != n - 1) qp(lab, n, x + 1, y, xc, yc, f);
+			if (x != 0) qp(lab, n, x - 1, y, xc, yc, f);
+			if (y != n - 1) qp(lab, n, x, y + 1, xc, yc, f);
+			if (y != 0) qp(lab, n, x, y - 1, xc, yc, f);
+		}
+		lab[x][y] = ' ';
+	}
+}
+
+void Solve()
+{
+	Task("BackTrack15");
+	int n, x, y, xc, yc;
+	string s;
+	fstream f, f2;
+	pt >> s;
+	pt >> n >> x >> y >> xc >> yc;
+	f.open(s.c_str(), ios::in);
+	char** a = new char* [n];
+	for (int i = 0; i < n; i++)
+		a[i] = new char[n];
+	for (int i = 0; i < n; i++) {
+		getline(f, s);
+		for (int j = 0; j < n; j++)
+			a[i][j] = s[j];
+	}
+	pt >> s;
+	f2.open(s.c_str(), ios::out);
+	qp(a, n, x - 1, y - 1, xc - 1, yc - 1, f2);
+	for (int i = 0; i < n; i++)
+		delete[] a[i];
+	delete[] a;
+	f.close();
+	f2.close();
+}
